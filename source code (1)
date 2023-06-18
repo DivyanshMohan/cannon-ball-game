@@ -1,0 +1,105 @@
+import pygame
+import math
+
+# Initialize Pygame
+pygame.init()
+
+# Define colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+# Set the width and height of the game window
+window_width = 800
+window_height = 600
+window_size = (window_width, window_height)
+window = pygame.display.set_mode(window_size)
+pygame.display.set_caption("Cannon Ball Game")
+
+# Set the clock for the game
+clock = pygame.time.Clock()
+
+# Set the position and size of the cannon
+cannon_x = 50
+cannon_y = window_height // 2
+cannon_width = 30
+cannon_height = 20
+
+# Set the initial angle of the cannon
+cannon_angle = 45
+
+# Set the initial speed and direction of the cannonball
+cannonball_speed = 10
+cannonball_dx = cannonball_speed * math.cos(math.radians(cannon_angle))
+cannonball_dy = -cannonball_speed * math.sin(math.radians(cannon_angle))
+
+# Set the position and size of the target
+target_x = window_width - 50
+target_y = window_height // 2
+target_width = 30
+target_height = 60
+
+# Set the initial score
+score = 0
+
+# Main game loop
+running = True
+while running:
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                cannon_angle += 5
+                cannonball_dx = cannonball_speed * math.cos(math.radians(cannon_angle))
+                cannonball_dy = -cannonball_speed * math.sin(math.radians(cannon_angle))
+            elif event.key == pygame.K_DOWN:
+                cannon_angle -= 5
+                cannonball_dx = cannonball_speed * math.cos(math.radians(cannon_angle))
+                cannonball_dy = -cannonball_speed * math.sin(math.radians(cannon_angle))
+            elif event.key == pygame.K_SPACE:
+                cannonball_x = cannon_x + cannon_width
+                cannonball_y = cannon_y + cannon_height // 2
+
+    # Update cannonball position
+    cannonball_x += cannonball_dx
+    cannonball_y += cannonball_dy
+
+    # Check for collision with the target
+    if cannonball_x + 10 >= target_x and cannonball_y + 10 >= target_y and cannonball_y <= target_y + target_height:
+        score += 1
+        cannonball_x = cannon_x + cannon_width
+        cannonball_y = cannon_y + cannon_height // 2
+
+    # Check for collision with the game window boundaries
+    if cannonball_x < 0 or cannonball_x > window_width or cannonball_y < 0 or cannonball_y > window_height:
+        cannonball_x = cannon_x + cannon_width
+        cannonball_y = cannon_y + cannon_height // 2
+
+    # Rendering
+    window.fill(BLACK)
+
+    # Draw cannon
+    pygame.draw.rect(window, GREEN, (cannon_x, cannon_y, cannon_width, cannon_height))
+
+    # Draw cannonball
+    pygame.draw.circle(window, RED, (int(cannonball_x), int(cannonball_y)), 10)
+
+    # Draw target
+    pygame.draw.rect(window, WHITE, (target_x, target_y, target_width, target_height))
+
+    # Display score
+    font = pygame.font.Font(None, 36)
+    text = font.render("Score: " + str(score), True, WHITE)
+    window.blit(text, (10, 10))
+
+    # Update the game display
+    pygame.display.flip()
+
+    # Set the frame rate of the game
+    clock.tick(60)
+
+# Quit the game
+pygame.quit()
